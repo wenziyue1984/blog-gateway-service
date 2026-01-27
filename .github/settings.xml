@@ -11,6 +11,14 @@
           xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
                               http://maven.apache.org/xsd/settings-1.0.0.xsd">
 
+    <servers>
+        <server>
+            <id>github-wenziyue-bom</id>
+            <username>${env.GITHUB_ACTOR}</username>         <!-- 自动注入当前 GitHub 用户名 -->
+            <password>${env.GITHUB_TOKEN}</password>         <!-- 自动注入 GITHUB_TOKEN，无需手动配置 -->
+        </server>
+    </servers>
+
     <!-- profiles：定义一组“仓库下载策略” -->
     <profiles>
         <profile>
