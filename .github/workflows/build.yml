@@ -1,0 +1,130 @@
+# 这个文件放在：.github/workflows/build.yml
+# 它是 GitHub Actions 的工作流：负责“打 jar -> 构建镜像 -> 推送到 GHCR”
+
+# 工作流在 GitHub Actions 页面里显示的名字
+name: Build & Push Docker Image
+
+# 触发条件：当你 push 到 master 或 preview 分支时触发
+on:
+  push:
+    branches:
+      - master
+      - preview
+
+# 工作流需要哪些权限
+permissions:
+  # 允许读取仓库代码（checkout 用）
+  contents: read
+  # 允许把镜像推送到 GitHub Container Registry（GHCR）
+  packages: write
+
+# 定义一个 job（一次流水线执行里的一组步骤）
+jobs:
+  # job 的名字叫 docker（随便起）
+  docker:
+    # 指定运行环境：GitHub 提供的 Ubuntu 虚拟机
+    runs-on: ubuntu-latest
+
+    # 定义一些环境变量，后面步骤会用到
+    env:
+      # 镜像名：固定格式 ghcr.io/拥有者/仓库名
+      # github.repository_owner 是你的 GitHub 用户名
+      # github.event.repository.name 是仓库名（比如 blog-gateway-service）
+      IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}
+
+      # 你的 jar 文件在仓库里的路径（mvn package 后生成的）
+      # 你现在是 build/blog-gateway-service.jar
+      JAR_PATH: build/blog-gateway-service.jar
+
+    # job 里按顺序执行的步骤
+    steps:
+      # 步骤1：把仓库代码拉到虚拟机里
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 步骤2：装 JDK 8（因为你项目是 Java 8）
+      - name: Set up JDK 8
+        uses: actions/setup-java@v4
+        with:
+          # Temurin 是常用的 OpenJDK 发行版
+          distribution: temurin
+          # 安装 Java 8
+          java-version: "8"
+          # 开启 Maven 依赖缓存，下次会更快
+          cache: maven
+
+      # 步骤3：打包 jar（跳过测试，先跑通流程）
+      - name: Build jar (skip tests)
+        # -B 是 batch mode（CI 环境不交互）
+        # -DskipTests 跳过测试
+        # clean package 重新构建
+        run: mvn -B -DskipTests clean package
+
+      # 步骤4：确认 jar 真的存在，不存在就直接失败（避免构建出空镜像）
+      - name: Verify jar exists
+        run: |
+          if [ ! -f "${JAR_PATH}" ]; then
+            echo "Jar not found: ${JAR_PATH}"
+            exit 1
+          fi
+
+      # 步骤5：根据你 push 的分支决定“固定 tag”
+      # master -> prod
+      # preview -> preview
+      - name: Decide image tag by branch
+        run: |
+          if [ "${GITHUB_REF_NAME}" = "master" ]; then
+            echo "FIXED_TAG=prod" >> $GITHUB_ENV
+          elif [ "${GITHUB_REF_NAME}" = "preview" ]; then
+            echo "FIXED_TAG=preview" >> $GITHUB_ENV
+          else
+            echo "Unexpected branch: ${GITHUB_REF_NAME}"
+            exit 1
+          fi
+
+          # 再额外生成一个“可回滚 tag”，比如 sha-1a2b3c4
+          echo "SHA_TAG=sha-${GITHUB_SHA::7}" >> $GITHUB_ENV
+
+      # 步骤6：登录到 GHCR（GitHub 的镜像仓库）
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          # 要登录的 registry
+          registry: ghcr.io
+          # 用户名用当前触发流水线的账号
+          username: ${{ github.actor }}
+          # 密码用 GitHub 自动提供的 token（你不用自己建）
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # 步骤7：准备 Buildx（更稳定、更快，支持缓存/多架构）
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # 步骤8：构建镜像并推送
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          # 构建上下文：整个仓库根目录（Docker 构建时能看到的文件范围）
+          context: .
+          # Dockerfile 的路径
+          file: deploy/preview/Dockerfile
+          # push=true 表示构建完成后直接推送到 GHCR
+          push: true
+          # 你的服务器大概率是 x86 Linux，所以用 amd64
+          platforms: linux/amd64
+
+          # 传给 Dockerfile 的 ARG：告诉它 jar 在哪
+          # Dockerfile 里有：ARG JAR_FILE=...
+          build-args: |
+            JAR_FILE=${{ env.JAR_PATH }}
+
+          # 推两个 tag：
+          # 1) 固定 tag：prod 或 preview（根据分支决定）
+          # 2) sha tag：用于回滚
+          tags: |
+            ${{ env.IMAGE_NAME }}:${{ env.FIXED_TAG }}
+            ${{ env.IMAGE_NAME }}:${{ env.SHA_TAG }}
+
+          # 开启 GitHub Actions 的构建缓存：后续更快
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

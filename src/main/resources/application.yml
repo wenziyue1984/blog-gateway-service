@@ -1,0 +1,71 @@
+spring:
+  application:
+    name: blog-gateway-service
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+    import:
+      - optional:nacos:blog-gateway-service.yaml?group=BLOG&refreshEnabled=true
+  cloud:
+    nacos:
+      config:
+        server-addr: ${NACOS_SERVER_URL_DEV}
+        namespace: ${NACOS_CONFIG_NAMESPACE_DEV}
+        file-extension: yaml
+      discovery:
+        server-addr: ${NACOS_SERVER_URL_DEV}
+        namespace: ${NACOS_DISCOVERY_NAMESPACE_DEV}
+        group: ${NACOS_DISCOVERY_GROUP_DEV}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+    import:
+      - optional:nacos:blog-common.yaml?group=BLOG&refreshEnabled=true
+      - optional:nacos:blog-gateway-service.yaml?group=BLOG&refreshEnabled=true
+
+  cloud:
+    nacos:
+      # 业务服务访问 Nacos 需要的账号密码
+      username: ${NACOS_USERNAME_TEST}
+      password: ${NACOS_PASSWORD_TEST}
+
+      config:
+        server-addr: ${NACOS_SERVER_URL_TEST}
+        namespace: ${NACOS_CONFIG_NAMESPACE_TEST}
+        file-extension: yaml
+
+      discovery:
+        server-addr: ${NACOS_SERVER_URL_TEST}
+        namespace: ${NACOS_DISCOVERY_NAMESPACE_TEST}
+        group: ${NACOS_DISCOVERY_GROUP_TEST}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: preview
+    import:
+      - optional:nacos:blog-common.yaml?group=BLOG&refreshEnabled=true
+      - optional:nacos:blog-gateway-service.yaml?group=BLOG&refreshEnabled=true
+
+  cloud:
+    nacos:
+      # 业务服务访问 Nacos 需要的账号密码
+      username: ${NACOS_USERNAME_PREVIEW}
+      password: ${NACOS_PASSWORD_PREVIEW}
+
+      config:
+        server-addr: ${NACOS_SERVER_URL_PREVIEW}
+        namespace: ${NACOS_CONFIG_NAMESPACE_PREVIEW}
+        file-extension: yaml
+
+      discovery:
+        server-addr: ${NACOS_SERVER_URL_PREVIEW}
+        namespace: ${NACOS_DISCOVERY_NAMESPACE_PREVIEW}
+        group: ${NACOS_DISCOVERY_GROUP_PREVIEW}

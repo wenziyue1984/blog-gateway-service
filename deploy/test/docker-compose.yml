@@ -1,0 +1,44 @@
+version: "3.8"
+
+services:
+  gateway:
+    container_name: blog-gateway-service
+    image: eclipse-temurin:8-jre
+
+    env_file:
+      - ../../.env
+
+    # 把 jar 从项目的 build 目录挂进容器
+    volumes:
+      # 左边：宿主机 jar 的路径（相对于这个 compose 文件所在目录）
+      # 右边：容器内路径
+      - ../../build/blog-gateway-service.jar:/app/app.jar:ro
+
+      # 把容器日志目录挂到本地，方便直接tail查看
+      - /Users/wenziyue/docker/blog-logs:/logs
+
+    ports:
+      - "8080:8080"
+
+    environment:
+      # 用 test 环境启动（你说本地 docker 联调用 test）
+      SPRING_PROFILES_ACTIVE: test
+      LOGGING_FILE_PATH: /logs/gateway # 日志文件在docker中的位置
+      TZ: Asia/Shanghai # 时区
+
+      # 如果你希望把日志位置固定成绝对路径，建议你在 Nacos 配置里把 logging.file.path 设成 /logs/gateway
+      # 这样配合 volumes 才能把日志稳稳落在 ./logs 下
+      JAVA_OPTS: "-Xms256m -Xmx512m -Duser.timezone=Asia/Shanghai"
+
+    # 直接跑 jar
+    command: sh -lc 'java $JAVA_OPTS -jar /app/app.jar'
+
+    networks:
+      - blog-net
+
+    restart: unless-stopped
+
+networks:
+  blog-net:
+    external: true
+    name: blog-net
