@@ -123,6 +123,10 @@
     <!-- 配置 GitHub Packages 仓库 -->
     <repositories>
         <repository>
+            <id>github-bom</id>
+            <url>https://maven.pkg.github.com/wenziyue1984/wenziyue-bom</url>
+        </repository>
+        <repository>
             <id>github-auth-core</id>
             <url>https://maven.pkg.github.com/wenziyue1984/wenziyue-auth-core</url>
         </repository>
