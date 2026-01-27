@@ -42,6 +42,19 @@ jobs:
 
     # job 里按顺序执行的步骤
     steps:
+      # 验证github_token权限
+      - name: Verify GH Packages auth (BOM)
+        env:
+          # 这里明确用你的 PAT
+          GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+        run: |
+          set -e
+          echo "[INFO] check auth to GitHub Packages (maven)"
+          curl -I -sS \
+            -u "wenziyue1984:${GITHUB_TOKEN}" \
+            https://maven.pkg.github.com/wenziyue1984/wenziyue-bom/ \
+            | head -n 5
+
       # 步骤1：把仓库代码拉到虚拟机里
       - name: Checkout code
         uses: actions/checkout@v4
