@@ -55,6 +55,18 @@ jobs:
             https://maven.pkg.github.com/wenziyue1984/wenziyue-bom/ \
             | head -n 5
 
+      # 验证github_token在wenziyue-auth-core的权限
+      - name: Verify GH Packages auth (AUTH-CORE)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+        run: |
+          set -e
+          echo "[INFO] check auth to GitHub Packages (auth-core)"
+          curl -I -sS \
+            -u "wenziyue1984:${GITHUB_TOKEN}" \
+            https://maven.pkg.github.com/wenziyue1984/wenziyue-auth-core/ \
+            | head -n 20
+
       # 步骤1：把仓库代码拉到虚拟机里
       - name: Checkout code
         uses: actions/checkout@v4

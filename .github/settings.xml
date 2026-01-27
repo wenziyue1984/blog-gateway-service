@@ -7,7 +7,6 @@
         <server>
             <id>github-bom</id>
             <username>${env.GITHUB_ACTOR}</username>
-<!--            <username>wenziyue1984</username>-->
             <password>${env.GITHUB_TOKEN}</password>
         </server>
         <server>
