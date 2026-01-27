@@ -70,12 +70,15 @@ jobs:
           # 开启 Maven 依赖缓存，下次会更快
           cache: maven
 
-      # 步骤3：打包 jar（跳过测试，先跑通流程）
+      # 步骤3：打包 jar（跳过测试）
       - name: Build jar (skip tests)
-        # -B 是 batch mode（CI 环境不交互）
-        # -DskipTests 跳过测试
-        # clean package 重新构建
-        run: mvn -B -DskipTests clean package
+        env:
+          # 关键：让 Maven 读取 GitHub Packages 时用 PAT，而不是 Actions 自带 token
+          GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+        run: |
+          # -s 指定 Maven settings.xml（否则你仓库里的 .github/settings.xml 不会生效）
+          # clean package 重新构建
+          mvn -B -s .github/settings.xml -DskipTests clean package
 
       # 步骤4：确认 jar 真的存在，不存在就直接失败（避免构建出空镜像）
       - name: Verify jar exists
