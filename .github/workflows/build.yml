@@ -51,7 +51,7 @@ jobs:
           set -e
           echo "[INFO] check auth to GitHub Packages (maven)"
           curl -I -sS \
-            -u "wenziyue1984:${GITHUB_TOKEN}" \
+            -u "wenziyue1984:${GH_MAVEN_TOKEN}" \
             https://maven.pkg.github.com/wenziyue1984/wenziyue-bom/ \
             | head -n 5
 
@@ -63,7 +63,7 @@ jobs:
           set -e
           echo "[INFO] check auth to GitHub Packages (auth-core)"
           curl -I -sS \
-            -u "wenziyue1984:${GITHUB_TOKEN}" \
+            -u "wenziyue1984:${GH_MAVEN_TOKEN}" \
             https://maven.pkg.github.com/wenziyue1984/wenziyue-auth-core/ \
             | head -n 20
 
@@ -87,9 +87,8 @@ jobs:
         env:
           # 关键：让 Maven 读取 GitHub Packages 时用 PAT，而不是 Actions 自带 token
           GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+        # clean package 重新构建，指定 Maven settings.xml
         run: |
-          # -s 指定 Maven settings.xml（否则你仓库里的 .github/settings.xml 不会生效）
-          # clean package 重新构建
           mvn -B -s .github/settings.xml -DskipTests clean package
 
       # 步骤4：确认 jar 真的存在，不存在就直接失败（避免构建出空镜像）

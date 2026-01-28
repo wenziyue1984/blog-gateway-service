@@ -6,17 +6,17 @@
     <servers>
         <server>
             <id>github-bom</id>
-            <username>${env.GITHUB_ACTOR}</username>
+            <username>wenziyue1984</username>
             <password>${env.GITHUB_TOKEN}</password>
         </server>
         <server>
             <id>github-auth-core</id>
-            <username>${env.GITHUB_ACTOR}</username>
+            <username>wenziyue1984</username>
             <password>${env.GITHUB_TOKEN}</password>
         </server>
         <server>
             <id>wenziyue-redis</id>
-            <username>${env.GITHUB_ACTOR}</username>
+            <username>wenziyue1984</username>
             <password>${env.GITHUB_TOKEN}</password>
         </server>
     </servers>
@@ -24,7 +24,7 @@
     <!-- profiles：定义一组“仓库下载策略” -->
     <profiles>
         <profile>
-            <id>aliyun</id>
+            <id>ci</id>
 
             <!-- repositories：依赖下载仓库 -->
             <repositories>
@@ -89,7 +89,7 @@
 
     <!-- activeProfiles：默认启用上面的 aliyun profile -->
     <activeProfiles>
-        <activeProfile>aliyun</activeProfile>
+        <activeProfile>ci</activeProfile>
     </activeProfiles>
 
 </settings>
