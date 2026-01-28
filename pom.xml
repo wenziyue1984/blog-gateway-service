@@ -131,7 +131,7 @@
             <url>https://maven.pkg.github.com/wenziyue1984/wenziyue-auth-core</url>
         </repository>
         <repository>
-            <id>wenziyue-redis</id>
+            <id>github-redis</id>
             <url>https://maven.pkg.github.com/wenziyue1984/wenziyue-redis-starter</url>
         </repository>
     </repositories>
