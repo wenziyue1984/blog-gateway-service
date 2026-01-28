@@ -115,7 +115,7 @@ jobs:
           # push=true 表示构建完成后直接推送到 GHCR
           push: true
           # 你的服务器大概率是 x86 Linux，所以用 amd64
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
 
           # 传给 Dockerfile 的 ARG：告诉它 jar 在哪
           # Dockerfile 里有：ARG JAR_FILE=...
