@@ -42,6 +42,13 @@ jobs:
 
     # job 里按顺序执行的步骤
     steps:
+      - name: Assert token present
+        run: |
+          if [ -z "${GH_MAVEN_TOKEN}" ]; then
+            echo "GH_MAVEN_TOKEN is empty"
+            exit 1
+          fi
+          echo "GH_MAVEN_TOKEN is present (length=${#GH_MAVEN_TOKEN})"
       # 验证github_token权限
       - name: Verify GH Packages auth (BOM POM)
         run: |
