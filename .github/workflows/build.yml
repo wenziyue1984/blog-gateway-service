@@ -93,25 +93,8 @@ jobs:
           # 开启 Maven 依赖缓存，下次会更快
           cache: maven
 
-      - name: Debug token presence (safe)
-        run: |
-          if [ -z "${GITHUB_TOKEN}" ]; then
-            echo "GITHUB_TOKEN is EMPTY"
-          else
-            echo "GITHUB_TOKEN is PRESENT (len=${#GITHUB_TOKEN})"
-          fi
-
-          if [ -z "${{ secrets.GH_PACKAGES_TOKEN }}" ]; then
-            echo "GH_PACKAGES_TOKEN secret is EMPTY / NOT SET"
-          else
-            echo "GH_PACKAGES_TOKEN secret is PRESENT (len=${#{{ secrets.GH_PACKAGES_TOKEN }}})"
-          fi
-
       # 步骤3：打包 jar（跳过测试）
       - name: Build jar (skip tests)
-        # 打包时maven用自己的Personal Access Token:secrets.GH_PACKAGES_TOKEN，只用在打包时
-        env:
-          GH_MAVEN_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
         # clean package 重新构建，指定 Maven settings.xml
         run: |
           mvn -B -s .github/settings.xml -DskipTests clean package
