@@ -42,41 +42,41 @@ jobs:
 
     # job 里按顺序执行的步骤
     steps:
-      - name: Debug secrets presence
-        run: |
-          if [ -z "${{ secrets.GH_PACKAGES_TOKEN }}" ]; then
-            echo "secrets.GH_PACKAGES_TOKEN is EMPTY (not injected)"
-          else
-            echo "secrets.GH_PACKAGES_TOKEN is PRESENT"
-          fi
-      - name: Assert token present
-        run: |
-          if [ -z "${GITHUB_TOKEN}" ]; then
-            echo "GITHUB_TOKEN is empty"
-            exit 1
-          fi
-          echo "GITHUB_TOKEN is present (length=${#GITHUB_TOKEN})"
-      # 验证github_token权限
-      - name: Verify GH Packages auth (BOM POM)
-        run: |
-          set -e
-          echo "[INFO] verify bom pom can be downloaded"
-          curl -I -sS \
-            -u "wenziyue1984:${GITHUB_TOKEN}" \
-            "https://maven.pkg.github.com/wenziyue1984/wenziyue-bom/com/wenziyue/wenziyue-bom/1.0.10/wenziyue-bom-1.0.10.pom" \
-            | head -n 20
-
-      # 验证github_token在wenziyue-auth-core的权限
-      - name: Verify GH Packages auth (AUTH-CORE)
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
-        run: |
-          set -e
-          echo "[INFO] check auth to GitHub Packages (auth-core)"
-          curl -I -sS \
-            -u "wenziyue1984:${GITHUB_TOKEN}" \
-            https://maven.pkg.github.com/wenziyue1984/wenziyue-auth-core/ \
-            | head -n 20
+#      - name: Debug secrets presence
+#        run: |
+#          if [ -z "${{ secrets.GH_PACKAGES_TOKEN }}" ]; then
+#            echo "secrets.GH_PACKAGES_TOKEN is EMPTY (not injected)"
+#          else
+#            echo "secrets.GH_PACKAGES_TOKEN is PRESENT"
+#          fi
+#      - name: Assert token present
+#        run: |
+#          if [ -z "${GITHUB_TOKEN}" ]; then
+#            echo "GITHUB_TOKEN is empty"
+#            exit 1
+#          fi
+#          echo "GITHUB_TOKEN is present (length=${#GITHUB_TOKEN})"
+#      # 验证github_token权限
+#      - name: Verify GH Packages auth (BOM POM)
+#        run: |
+#          set -e
+#          echo "[INFO] verify bom pom can be downloaded"
+#          curl -I -sS \
+#            -u "wenziyue1984:${GITHUB_TOKEN}" \
+#            "https://maven.pkg.github.com/wenziyue1984/wenziyue-bom/com/wenziyue/wenziyue-bom/1.0.10/wenziyue-bom-1.0.10.pom" \
+#            | head -n 20
+#
+#      # 验证github_token在wenziyue-auth-core的权限
+#      - name: Verify GH Packages auth (AUTH-CORE)
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+#        run: |
+#          set -e
+#          echo "[INFO] check auth to GitHub Packages (auth-core)"
+#          curl -I -sS \
+#            -u "wenziyue1984:${GITHUB_TOKEN}" \
+#            https://maven.pkg.github.com/wenziyue1984/wenziyue-auth-core/ \
+#            | head -n 20
 
       # 步骤1：把仓库代码拉到虚拟机里
       - name: Checkout code
@@ -95,9 +95,6 @@ jobs:
 
       # 步骤3：打包 jar（跳过测试）
       - name: Build jar (skip tests)
-#        env:
-#          # 关键：让 Maven 读取 GitHub Packages 时用 PAT，而不是 Actions 自带 token
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # clean package 重新构建，指定 Maven settings.xml
         run: |
           mvn -B -s .github/settings.xml -DskipTests clean package

@@ -15,7 +15,7 @@
             <password>${env.GITHUB_TOKEN}</password>
         </server>
         <server>
-            <id>wenziyue-redis</id>
+            <id>github-redis</id>
             <username>wenziyue1984</username>
             <password>${env.GITHUB_TOKEN}</password>
         </server>
@@ -61,7 +61,7 @@
                 </repository>
 
                 <repository>
-                    <id>wenziyue-redis</id>
+                    <id>github-redis</id>
                     <url>https://maven.pkg.github.com/wenziyue1984/wenziyue-redis-starter</url>
                     <releases><enabled>true</enabled></releases>
                     <snapshots><enabled>true</enabled></snapshots>
