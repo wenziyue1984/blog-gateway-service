@@ -95,6 +95,8 @@ jobs:
 
       # 步骤3：打包 jar（跳过测试）
       - name: Build jar (skip tests)
+        env:
+          GH_MAVEN_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
         # clean package 重新构建，指定 Maven settings.xml
         run: |
           mvn -B -s .github/settings.xml -DskipTests clean package
