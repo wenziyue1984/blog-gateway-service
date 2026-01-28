@@ -3,36 +3,23 @@
           xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
                               http://maven.apache.org/xsd/settings-1.0.0.xsd">
 
-    <!-- servers：只定义一个“GitHub Packages 的统一凭证” -->
     <servers>
         <server>
-            <!-- 这个 id 需要和下面 mirrorOf 对应 -->
-            <id>github</id>
-
-            <!-- 用户名固定写你账号也行 -->
+            <id>github-bom</id>
             <username>wenziyue1984</username>
-
-            <!-- 密码统一读 GH_MAVEN_TOKEN（PAT） -->
-            <password>${env.GH_MAVEN_TOKEN}</password>
+            <password>${env.GITHUB_TOKEN}</password>
+        </server>
+        <server>
+            <id>github-auth-core</id>
+            <username>wenziyue1984</username>
+            <password>${env.GITHUB_TOKEN}</password>
+        </server>
+        <server>
+            <id>wenziyue-redis</id>
+            <username>wenziyue1984</username>
+            <password>${env.GITHUB_TOKEN}</password>
         </server>
     </servers>
-
-    <!-- mirrors：把所有 github packages 的仓库请求都“镜像”到同一个仓库入口 -->
-    <mirrors>
-        <mirror>
-            <!-- 镜像的 id，必须等于 servers 里的 id，才能自动带上认证 -->
-            <id>github</id>
-
-            <!-- 镜像的目标地址：GitHub Packages 的 Maven 入口 -->
-            <!-- 注意：这里不是某个具体仓库，而是统一入口 -->
-            <url>https://maven.pkg.github.com/wenziyue1984/*</url>
-
-            <!-- mirrorOf：匹配所有你 pom / profile 里配置的 GitHub repo id -->
-            <!-- * 的意思是：所有仓库都走这个 mirror -->
-            <mirrorOf>github-bom,github-auth-core,wenziyue-redis</mirrorOf>
-        </mirror>
-    </mirrors>
-
 
     <!-- profiles：定义一组“仓库下载策略” -->
     <profiles>
@@ -74,7 +61,7 @@
                 </repository>
 
                 <repository>
-                    <id>github-redis</id>
+                    <id>wenziyue-redis</id>
                     <url>https://maven.pkg.github.com/wenziyue1984/wenziyue-redis-starter</url>
                     <releases><enabled>true</enabled></releases>
                     <snapshots><enabled>true</enabled></snapshots>

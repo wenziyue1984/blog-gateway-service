@@ -43,17 +43,14 @@ jobs:
     # job 里按顺序执行的步骤
     steps:
       # 验证github_token权限
-      - name: Verify GH Packages auth (BOM)
-        env:
-          # 这里明确用你的 PAT
-          GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+      - name: Verify GH Packages auth (BOM POM)
         run: |
           set -e
-          echo "[INFO] check auth to GitHub Packages (maven)"
+          echo "[INFO] verify bom pom can be downloaded"
           curl -I -sS \
             -u "wenziyue1984:${GH_MAVEN_TOKEN}" \
-            https://maven.pkg.github.com/wenziyue1984/wenziyue-bom/ \
-            | head -n 5
+            "https://maven.pkg.github.com/wenziyue1984/wenziyue-bom/com/wenziyue/wenziyue-bom/1.0.10/wenziyue-bom-1.0.10.pom" \
+            | head -n 20
 
       # 验证github_token在wenziyue-auth-core的权限
       - name: Verify GH Packages auth (AUTH-CORE)
